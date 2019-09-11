@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  elasticsearch:
+    image: elasticsearch:6.4.2
+    expose:
+      - "9200"
+      - "9300"
+    networks:
+      - api
+    command: elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"
+  logstash:
+    image: logstash:6.4.2
+    ports:
+      - "12201:12201/udp"
+    command: -e 'input { gelf { host => "0.0.0.0" port => 12201 } }
+      output { elasticsearch { hosts => ["elasticsearch"] } }'
+    networks:
+      - api
+    depends_on:
+      - elasticsearch
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"
+  kibana:
+    image: kibana:6.4.2
+    expose:
+      - "5601"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    networks:
+      - api
+    depends_on:
+      - logstash
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.port=5601"
+      - "traefik.frontent.rule=Host:kibana.domain.tld"

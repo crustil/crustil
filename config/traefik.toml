@@ -1,0 +1,48 @@
+defaultEntryPoints = ["http", "https"]
+
+[api]
+entryPoint = "api"
+dashboard = true
+
+[docker]
+  domain = "<domain.fr>"
+  endpoint = "unix:///var/run/docker.sock"
+  watch = true
+  swarmmode = false
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+	#[entryPoints.http.redirect]
+    #entryPoint = "https"
+  [entryPoints.https]
+    address = ":443"
+    [entryPoints.https.tls]
+  [entryPoints.api]
+     address=":8080"
+     [entryPoints.api.auth]
+       [entryPoints.api.auth.basic]
+         users = [
+           "admin:$2y$10$nrImwCNd..RQJCkt3qzR2O3TZLQndfuYOuZU3JNV1xXc.Sh.7WGZu"
+         ]
+
+[ping]
+entryPoint = "http"
+
+[acme]
+  email = "contact@unreadlio.fr"
+  caServer = "https://acme-v02.api.letsencrypt.org/directory"
+  storage = "/acme.json"
+  acmeLogging = true
+  onDemand = false
+  onHostRule = false
+  entryPoint = "https"
+  [acme.httpChallenge]
+    entryPoint = "http"
+
+[[acme.domains]]
+  main = "domain.fr"
+  sans = [
+    "domain.fr",
+    "api.domain.fr"
+  ]

@@ -1,0 +1,63 @@
+version: "3.7"
+services:
+  mysql:
+    image: mysql/mysql-cluster:latest
+    command: ['--log-error-verbosity=3', '--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password']
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    networks:
+      - api
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../sql/init:/docker-entrypoint-initdb.d"
+    labels:
+      - "traefik.enable=false"
+  db:
+    image: mariadb:latest
+    command: ['--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password', '--skip-name-resolve']
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    networks:
+      - api
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../sql/init:/docker-entrypoint-initdb.d"
+      - "../sql/config/my.cnf:/etc/mysql/my.cnf"
+    labels:
+      - "traefik.enable=false"
+  adminer:
+    image: adminer
+    ports:
+      - "8085:8080"
+    networks:
+      - api
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"
+  mongo:
+    image: mongo:latest
+    expose:
+      - "27017"
+    networks:
+      - api
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"

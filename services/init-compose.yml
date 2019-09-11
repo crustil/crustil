@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+  traefik:
+    image: traefik:latest
+    command: --web --api --docker --logLevel=DEBUG
+    networks:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../config/traefik.toml:/traefik.toml"
+      - "../config/acme.json:/acme.json"
+    labels:
+      - "traefik.enable=false"
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    networks:
+      - api
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbi42!"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  api:
+    driver: bridge

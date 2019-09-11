@@ -1,0 +1,12 @@
+FROM findepi/graalvm
+
+COPY test.sh /tp/
+
+RUN apt-get update && apt-get install gcc zlib1g zlib1g-dev -y
+
+RUN gu install native-image
+
+WORKDIR /tp
+
+ENTRYPOINT ["sh", "-c"]
+CMD ["./test.sh"]

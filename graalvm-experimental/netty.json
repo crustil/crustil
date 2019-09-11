@@ -1,0 +1,60 @@
+[
+  {
+    "name": "org.apache.logging.log4j.message.ReusableMessageFactory",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "org.apache.logging.log4j.message.DefaultFlowMessageFactory",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.socket.nio.NioSocketChannel",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.netty.channel.socket.nio.NioServerSocketChannel",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "org.apache.logging.log4j.message.ParameterizedMessageFactory",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vertx.core.impl.launcher.commands.VersionCommand",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "getVersion",
+        "parameterTypes": []
+      }
+    ]
+  }
+]
