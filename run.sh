@@ -24,7 +24,7 @@ echo -e "=> db-user: \t\t${props['db_user']}"
 echo -e "=> addon-pos: \t\t${props['addon_pos']}"
 echo -e "==================================="
 
-export COMPOSE_FILE=services/init-compose.yml:services/elk-compose.yml:services/gateway-compose.yml:services/service-compose.yml:services/addons-service-compose.yml:services/database-compose.yml:dashboard/dashboard-compose.yml
+export COMPOSE_FILE="services/init-compose.yml:services/elk-compose.yml:services/gateway-compose.yml:services/service-compose.yml:services/addons-service-compose.yml:services/database-compose.yml:dashboard/dashboard-compose.yml"
 export COMPOSE_PROJECT_NAME=${props['project_name']}
 
 export DOMAIN=${props['domain']}
