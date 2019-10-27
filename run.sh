@@ -71,7 +71,7 @@ function start() {
             ${DB_CONNECTOR} \
             $(cat ./services-list-prod)
     elif [[ $1 != "" ]]; then
-        docker-compose up -d $1
+        docker-compose up -d $1 $2
     else
         usage
     fi
@@ -108,6 +108,10 @@ elif [[ $1 == "start" ]]; then
     if [[ $2 == "scale" ]]; then
         docker-compose up -d $(echo $(cat ./services-list-scale) | sed 's/ / --scale /g' | sed 's/^/--scale /') $(cat ./services-list-prod)
     fi
+elif [[ $1 == "build" ]]; then
+    docker-compose build $2
+elif [[ $1 == "tool" ]]; then
+      docker-compose up $2
 elif [[ $1 == "restart" ]]; then
     stop $2
     start $2

@@ -51,6 +51,23 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:
       - "traefik.enable=false"
+  rethinkdb:
+    build: ../rethinkdb/
+    ports:
+     - "28015"
+     - "8080"
+    networks:
+      - api
+    volumes:
+     - /data/rethinkdb:/data
+    command: rethinkdb -d /data --bind all
+  rethinkdb-tools:
+    build: ../rethinkdb/
+    volumes:
+     - ../rethinkdb/:/data
+    networks:
+      - api
+    command: rethinkdb import -f /data/data.json --table data.table --format json -c rethinkdb:28015
   mongo:
     image: mongo:latest
     expose:
