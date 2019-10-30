@@ -2,8 +2,50 @@
 
 set -e
 
-if [[ ! -f config.properties ]]; then
-    echo "config.properties not found!"
+CONFIG_FILE_NAME="config.properties"
+CONFIG_FILE_PATH="./"
+
+if [[ " $@ " =~ --config-path=([^' ']+) ]]; then
+  CONFIG_FILE_PATH=${BASH_REMATCH[1]}
+  if [[ "$CONFIG_FILE_PATH" != "" ]]; then
+    echo "= set config-path to $CONFIG_FILE_PATH"
+  else
+    echo "error: ${BASH_REMATCH[0]} is empty !"
+    exit -1
+  fi
+fi
+
+if [[ " $@ " =~ --config-name=([^' ']+) ]]; then
+  CONFIG_FILE_NAME=${BASH_REMATCH[1]}
+  if [[ "$CONFIG_FILE_PATH" != "" ]]; then
+    echo "= set config-path to $CONFIG_FILE_NAME"
+  else
+    echo "error: ${BASH_REMATCH[0]} is empty !"
+    exit -1
+  fi
+fi
+
+generate_default_properties_file() {
+  echo "project_name=<name>" > $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "domain=<domain.fr>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "api=<api.domain.fr>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "registry=registry.cloudvector.fr/<project_name>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "version=0.0.1" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "db_connector=db" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "db_root_host=%" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "db_database=<database>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "db_root_password=<password>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "db_user=<username>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "db_password=<password>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "addon_pos=41" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+}
+
+if [[ " $@ " == *" --generate-config-file "* ]]; then
+  generate_default_properties_file
+fi
+
+if [[ ! -f $CONFIG_FILE_PATH/$CONFIG_FILE_NAME ]]; then
+    echo "error: $CONFIG_FILE_PATH/$CONFIG_FILE_NAME not found!"
     exit -1
 fi
 
@@ -25,6 +67,9 @@ echo -e "=> addon-pos: \t\t${props['addon_pos']}"
 echo -e "==================================="
 
 export COMPOSE_FILE="services/init-compose.yml:services/elk-compose.yml:services/gateway-compose.yml:services/service-compose.yml:services/addons-service-compose.yml:services/database-compose.yml:dashboard/dashboard-compose.yml"
+
+# todo add compose project list
+
 export COMPOSE_PROJECT_NAME=${props['project_name']}
 
 export DOMAIN=${props['domain']}
