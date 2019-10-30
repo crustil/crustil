@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ip=$(ip a show eth0 | grep 'inet.*/16.*brd' | egrep -o '[0-9].*/')
+ip=$(ip a show eth0 | grep 'inet.*/.*brd' | egrep -o '[0-9].*/')
 ip=${ip/\//}
 echo "IP: $ip"
 
