@@ -12,7 +12,7 @@ RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
 
 COPY $VERTICLE_FILE $VERTICLE_HOME/
-COPY src/config/docker.json $VERTICLE_HOME/
+COPY target/config/docker.json $VERTICLE_HOME/
 #COPY target/cluster.xml $VERTICLE_HOME/
 
 WORKDIR $VERTICLE_HOME

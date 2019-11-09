@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+# ./run.sh start law-service --project-path=../../micro-service/project --config-path=../config
+
 set -e
 
 CONFIG_FILE_NAME="config.properties"
 CONFIG_FILE_PATH="./"
+PROJECT_PATH="."
+COMPOSE_FILE_PATH="$PROJECT_PATH/service"
 
 if [[ " $@ " =~ --config-path=([^' ']+) ]]; then
   CONFIG_FILE_PATH=${BASH_REMATCH[1]}
@@ -25,11 +29,31 @@ if [[ " $@ " =~ --config-name=([^' ']+) ]]; then
   fi
 fi
 
+if [[ " $@ " =~ --project-path=([^' ']+) ]]; then
+  PROJECT_PATH=${BASH_REMATCH[1]}
+  if [[ "$PROJECT_PATH" != "" ]]; then
+    echo "= set config-path to $PROJECT_PATH"
+  else
+    echo "error: ${BASH_REMATCH[0]} is empty !"
+    exit -1
+  fi
+fi
+
+if [[ " $@ " =~ --compose-file-path=([^' ']+) ]]; then
+  COMPOSE_FILE_PATH="$PROJECT_PATH/${BASH_REMATCH[1]}"
+  if [[ "$COMPOSE_FILE_PATH" != "" ]]; then
+    echo "= set compose-file-path to $COMPOSE_FILE_PATH"
+  else
+    echo "error: ${BASH_REMATCH[0]} is empty !"
+    exit -1
+  fi
+fi
+
 generate_default_properties_file() {
   echo "project_name=<name>" > $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
   echo "domain=<domain.fr>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
   echo "api=<api.domain.fr>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
-  echo "registry=registry.cloudvector.fr/<project_name>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
+  echo "registry=registry.domain.fr/<project_name>" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
   echo "version=0.0.1" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
   echo "db_connector=db" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
   echo "db_root_host=%" >> $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
@@ -60,8 +84,10 @@ echo -e "=> domain: \t\t${props['domain']}"
 echo -e "=> api: \t\t${props['api']}"
 echo -e "=> registry: \t\t${props['registry']}"
 echo -e "=> version: \t\t${props['version']}"
+echo -e "=> db-connector: \t${props['db_connector']}"
 echo -e "=> db-host: \t\t${props['db_root_host']}"
 echo -e "=> db-database: \t${props['db_database']}"
+echo -e "=> db-root-password: \t${props['db_root_password']}"
 echo -e "=> db-user: \t\t${props['db_user']}"
 echo -e "=> addon-pos: \t\t${props['addon_pos']}"
 echo -e "==================================="
@@ -71,6 +97,7 @@ export COMPOSE_FILE="services/init-compose.yml:services/elk-compose.yml:services
 # todo add compose project list
 
 export COMPOSE_PROJECT_NAME=${props['project_name']}
+export COMPOSE_PROJECT_PREFIX=${props['project_name']}
 
 export DOMAIN=${props['domain']}
 export API=${props['api']}
@@ -154,9 +181,24 @@ elif [[ $1 == "start" ]]; then
         docker-compose up -d $(echo $(cat ./services-list-scale) | sed 's/ / --scale /g' | sed 's/^/--scale /') $(cat ./services-list-prod)
     fi
 elif [[ $1 == "build" ]]; then
-    docker-compose build $2
+    if [[ $2 == "java-service" ]]; then
+      SERVICE_LIST_WITH_PATH=$(find $PROJECT_PATH -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
+      for item in $SERVICE_LIST_WITH_PATH; do
+        if [[ "$item" =~ .*\/([a-z-]+-[a-z]+) ]]; then
+          current_item=${BASH_REMATCH[1]}
+          echo "build : $current_item"
+          mkdir -vp "${PROJECT_PATH}/${current_item}/target/config"
+          echo "generate docker.json config"
+          ( echo "cat <<EOF > ${PROJECT_PATH}/${current_item}/target/config/docker.json" ; cat ${PROJECT_PATH}/${current_item}/src/config/docker.json ) | sh
+          docker build --build-arg SERVICE=${current_item} -t "${COMPOSE_PROJECT_NAME}/${current_item}" -f ./java/Dockerfile ${item}/
+        fi
+      done
+    elif [[ $2 == "other" ]]; then
+      echo "other build"
+      docker-compose build $3
+    fi
 elif [[ $1 == "tool" ]]; then
-      docker-compose up $2
+    docker-compose up $2
 elif [[ $1 == "restart" ]]; then
     stop $2
     start $2
