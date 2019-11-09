@@ -76,7 +76,7 @@ fi
 typeset -A props
 while IFS=$':= \t' read key value; do
   [[ ${key} = [#!]* ]] || [[ ${key} = "" ]] || props[$key]=${value}
-done < config.properties
+done < $CONFIG_FILE_PATH/$CONFIG_FILE_NAME
 
 echo -e "======== Config properties ========"
 echo -e "=> project_name: \t${props['project_name']}"
@@ -290,17 +290,18 @@ elif [[ $1 == "swarm" && $# > 1 ]]; then
         docker service create --network mynet --replicas 2 --name registry -p 5000:5000 registry:2
         docker service ls
     elif [[ $2 == "pull" ]]; then
+        export COMPOSE_PROJECT_PREFIX=${REGISTRY}
         if [[ $3 != "" ]]; then
             docker-compose pull $3
         else
             docker-compose pull
         fi
-    elif [[ $2 == "push" && $# == 3 ]]; then
+    elif [[ $2 == "push" && $3 != "all" ]]; then
         docker tag ${COMPOSE_PROJECT_NAME}/$3 ${REGISTRY}/${COMPOSE_PROJECT_NAME}/$3:${VERSION}
         docker push ${REGISTRY}/${COMPOSE_PROJECT_NAME}/$3:${VERSION}
         docker tag ${REGISTRY}/${COMPOSE_PROJECT_NAME}/$3:${VERSION} ${REGISTRY}/${COMPOSE_PROJECT_NAME}/$3:latest
         docker push ${REGISTRY}/${COMPOSE_PROJECT_NAME}/$3:latest
-    elif [[ $2 == "push" && $# == 2 ]]; then
+    elif [[ $2 == "push" && $3 == "all" ]]; then
         while read -r line; do
             docker tag ${COMPOSE_PROJECT_NAME}/${line} ${REGISTRY}/${COMPOSE_PROJECT_NAME}/${line}:${VERSION}
             docker push ${REGISTRY}/${COMPOSE_PROJECT_NAME}/${line}:${VERSION}
