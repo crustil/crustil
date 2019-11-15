@@ -1,40 +1,48 @@
 version: "3.7"
 services:
-  mysql:
-    image: mysql/mysql-cluster:latest
-    command: ['--log-error-verbosity=3', '--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password']
-    expose:
-      - "3306"
-    environment:
-      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
-      - MYSQL_DATABASE=${CONFIG_DB_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
-      - MYSQL_USER=${CONFIG_DB_USER}
-      - MYSQL_PASSWORD=${CONFIG_DB_PASSWORD}
-    networks:
-      - api
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "../sql/init:/docker-entrypoint-initdb.d"
-    labels:
-      - "traefik.enable=false"
   db:
-    image: bitnami/mariadb:latest
-    command: ['--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password', '--skip-name-resolve']
-    expose:
-      - "3306"
-    environment:
-      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
-      - MYSQL_DATABASE=${CONFIG_DB_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
-      - MYSQL_USER=${CONFIG_DB_USER}
-      - MYSQL_PASSWORD=${CONFIG_DB_PASSWORD}
-    networks:
-      - api
+    image: 'bitnami/mariadb:10.3'
+    ports:
+      - '3306'
     volumes:
+      - 'mariadb_master_data:/bitnami/mariadb'
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d"
       - "../sql/config/my.cnf:/etc/mysql/my.cnf"
+    environment:
+      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
+      - MARIADB_REPLICATION_MODE=master
+      - MARIADB_REPLICATION_USER=repl_user
+      - MARIADB_USER=${CONFIG_DB_USER}
+      - MARIADB_USER_PASSWORD=${CONFIG_DB_USER}
+      - MARIADB_DATABASE=${CONFIG_DB_DATABASE}
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=no
+      - MARIADB_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
+    networks:
+      - api
+    labels:
+      - "traefik.enable=false"
+  db-slave:
+    image: 'bitnami/mariadb:10.3'
+    ports:
+      - '3306'
+    depends_on:
+      - db
+    environment:
+      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
+      - MARIADB_REPLICATION_MODE=slave
+      - MARIADB_REPLICATION_USER=repl_user
+      - MARIADB_USER=${CONFIG_DB_USER}
+      - MARIADB_USER_PASSWORD=${CONFIG_DB_USER}
+      - MARIADB_DATABASE=${CONFIG_DB_DATABASE}
+      - MARIADB_MASTER_HOST=mariadb-master
+      - MARIADB_MASTER_PORT_NUMBER=3306
+      - MARIADB_MASTER_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=no
+    networks:
+      - api
     labels:
       - "traefik.enable=false"
   adminer:
