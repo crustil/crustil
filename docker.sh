@@ -108,8 +108,6 @@ if [[ " $@ " == *" --prod "* ]]; then
 	done
 fi
 
-exit 0
-
 for current_compose_file in ${param['compose.path']//,/ }; do
   echo -e "\n# find compose files in: $current_compose_file"
   for current_compose_file in $(find $current_compose_file -type f -exec readlink -f {} \; | grep '.*-compose.yml'); do
