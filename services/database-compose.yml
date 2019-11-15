@@ -5,7 +5,7 @@ services:
     ports:
       - '3306'
     volumes:
-      - 'mariadb_master_data:/bitnami/mariadb'
+      - './mariadb_master_data:/bitnami/mariadb'
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d"
       - "../sql/config/my.cnf:/etc/mysql/my.cnf"
@@ -14,9 +14,9 @@ services:
       - MARIADB_REPLICATION_MODE=master
       - MARIADB_REPLICATION_USER=repl_user
       - MARIADB_USER=${CONFIG_DB_USER}
-      - MARIADB_USER_PASSWORD=${CONFIG_DB_USER}
+      - MARIADB_PASSWORD=${CONFIG_DB_USER}
       - MARIADB_DATABASE=${CONFIG_DB_DATABASE}
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - MARIADB_REPLICATION_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
       - ALLOW_EMPTY_PASSWORD=no
       - MARIADB_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
     networks:
@@ -34,13 +34,13 @@ services:
       - MARIADB_REPLICATION_MODE=slave
       - MARIADB_REPLICATION_USER=repl_user
       - MARIADB_USER=${CONFIG_DB_USER}
-      - MARIADB_USER_PASSWORD=${CONFIG_DB_USER}
+      - MARIADB_PASSWORD=${CONFIG_DB_USER}
       - MARIADB_DATABASE=${CONFIG_DB_DATABASE}
       - MARIADB_MASTER_HOST=mariadb-master
       - MARIADB_MASTER_PORT_NUMBER=3306
       - MARIADB_MASTER_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
       - ALLOW_EMPTY_PASSWORD=no
+      - MARIADB_REPLICATION_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
     networks:
       - api
     labels:
