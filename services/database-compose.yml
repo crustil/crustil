@@ -5,8 +5,6 @@ services:
     command: ['--log-error-verbosity=3', '--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password']
     expose:
       - "3306"
-    ports:
-      - "3306:3306"
     environment:
       - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
       - MYSQL_DATABASE=${CONFIG_DB_DATABASE}
@@ -25,8 +23,6 @@ services:
     command: ['--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password', '--skip-name-resolve']
     expose:
       - "3306"
-    ports:
-      - "3306:3306"
     environment:
       - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
       - MYSQL_DATABASE=${CONFIG_DB_DATABASE}
