@@ -86,6 +86,21 @@ while IFS=$':= \t' read key value; do
   fi
 done < "${param['config.file.path']}/${param['config.file.name']}"
 
+for service_key in "${!config[@]}"; do
+	if [[ "$service_key" == *"project.services."* ]]; then
+		if [[ "$INTERNAL_SERVICE_LIST" == "" ]]; then
+   		INTERNAL_SERVICE_LIST="${config[$service_key]}"
+		else
+			INTERNAL_SERVICE_LIST="$INTERNAL_SERVICE_LIST,${config[$service_key]}"
+ 		fi
+ 	fi
+done
+
+if [[ " $@ " == *" --prod "* ]]; then
+	echo "+ production mode, image from: ${config['registry']}/${config['project.name']}"
+  export CONFIG_PROJECT_NAME=${config['registry']}/${config['project.name']}
+fi
+
 for current_compose_file in ${param['compose.path']//,/ }; do
   echo -e "\n# find compose files in: $current_compose_file"
   for current_compose_file in $(find $current_compose_file -type f -exec readlink -f {} \; | grep '.*-compose.yml'); do
@@ -103,42 +118,22 @@ function service_list() {
     echo ==============================
     echo ========== Services ==========
     echo ==============================
-    echo $(cat ./$1) | tr " " "\n"
+    echo ${INTERNAL_SERVICE_LIST//,/$'\n'}
     echo ==============================
 }
 
-function start() {
-    if [[ $1 == "all" ]]; then
-        docker-compose up -d \
-            traefik \
-            hazelcast-management \
-            elasticsearch \
-            logstash \
-            kibana \
-            ${DB_CONNECTOR} \
-            $(cat ./services-list-prod)
-    elif [[ $1 == "stack" ]]; then
-        docker-compose up -d ${DB_CONNECTOR} $(cat ./services-list-prod)
-    elif [[ $1 == "prod" ]]; then
-        docker-compose up -d \
-            traefik \
-            hazelcast-management \
-            ${DB_CONNECTOR} \
-            $(cat ./services-list-prod)
-    elif [[ $1 != "" ]]; then
-        docker-compose up -d $1 $2
-    else
-        usage
-    fi
-}
-
-function stop() {
-    if [[ $1 == "all" ]]; then
-        docker-compose down
-    elif [[ $1 == "stack" ]]; then
-        docker-compose rm -svf $(cat ./services-list-prod)
-    else
-        docker-compose rm -svf $1
+function cmd() {
+    if [[ $2 == "all" ]]; then
+      docker-compose $1 ${INTERNAL_SERVICE_LIST//,/ }
+    elif [[ $2 == *"-service"* || $2 == *"-gateway"* ]]; then
+			docker-compose $1 $2
+		else
+			project_service=${config['project.services.'$2]}
+			if [[ "$project_service" != "" ]]; then
+        docker-compose $1 ${project_service//,/ }
+			else
+				usage
+			fi
     fi
 }
 
@@ -149,7 +144,11 @@ function sql() {
 }
 
 if [[ $1 == "stop" ]]; then
-    stop $2
+	if [[ $2 == "all" ]]; then
+		docker-compose down
+	else
+    cmd "rm -svf" $2
+	fi
 elif [[ $1 == "purge" ]]; then
     if [[ $(docker-compose ps -q) != "" ]]; then
         docker rm -f $(docker-compose ps -q)
@@ -159,10 +158,10 @@ elif [[ $1 == "purge" ]]; then
     fi
     docker volume prune
 elif [[ $1 == "start" ]]; then
-    start $2
-    if [[ $2 == "scale" ]]; then
-        docker-compose up -d $(echo $(cat ./services-list-scale) | sed 's/ / --scale /g' | sed 's/^/--scale /') $(cat ./services-list-prod)
-    fi
+    cmd "up -d" $2
+    #if [[ $2 == "scale" ]]; then
+    #    docker-compose up -d $(echo $(cat ./services-list-scale) | sed 's/ / --scale /g' | sed 's/^/--scale /') $(cat ./services-list-prod)
+    #fi
 elif [[ $1 == "build" ]]; then
     # todo move to external build script
     if [[ $2 == "java-service" ]]; then
@@ -184,10 +183,13 @@ elif [[ $1 == "build" ]]; then
 elif [[ $1 == "tool" ]]; then
     docker-compose up $2
 elif [[ $1 == "restart" ]]; then
-    stop $2
-    start $2
+		cmd "down" $2
+		cmd "up" $2
+elif [[ $1 == "rm" ]]; then
+			cmd "rm -svf" $2
 elif [[ $1 == "rebuild" ]]; then
-    stop all
+    cmd "down" all
+		cmd "rm -svf" all
     java/build.sh
     start all
 elif [[ $1 == "update" ]]; then
@@ -244,33 +246,13 @@ elif [[ $1 == "logs" ]]; then
         fi
         docker-compose logs -ft --tail=${tail} $3
      fi
-elif [[ $1 == "dev" ]]; then
-    # todo rewrite
-    service_list services-list-dev
-    docker-compose down
-    docker-compose up -d \
-            traefik \
-            hazelcast-management \
-            elasticsearch \
-            logstash \
-            kibana \
-            ${DB_CONNECTOR} \
-            $(cat ./services-list-dev)
-        if [[ $2 != "" ]]; then
-        tail="$2"
-    else
-        tail="all"
-    fi
-    docker-compose logs -ft --tail=${tail}
-elif [[ $1 == "mysql-dev" ]]; then
-    docker-compose up -d ${DB_CONNECTOR}
-elif [[ $1 == "sh" && $# == 2 ]]; then
+elif [[ $1 == "sh" ]]; then
     docker-compose exec $2 bash
 elif [[ $1 == "scale" ]]; then
     service_list services-list-scale
     docker-compose up -d $(echo $(cat ./services-list-scale) | sed 's/ / --scale /g' | sed 's/^/--scale /') $(cat ./services-list-prod)
 elif [[ $1 == "status" ]]; then
-    service_list services-list-prod
+    service_list
     docker-compose ps --services
     docker-compose ps
 elif [[ $1 == "swarm" && $# > 1 ]]; then
