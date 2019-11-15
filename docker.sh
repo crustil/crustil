@@ -96,17 +96,25 @@ for service_key in "${!config[@]}"; do
  	fi
 done
 
-if [[ " $@ " == *" --prod "* ]]; then
+function prod_init() {
 	for project_key in "${!config[@]}"; do
 		if [[ "$project_key" =~ project.(.*).name ]]; then
 			VAR_NAME=${project_key^^}
 			VAR_VERSION=${project_key//NAME/VERSION}
-			export "CONFIG_${VAR_NAME//./_}=${config[$project_key]}"
+			export "CONFIG_${VAR_NAME//./_}="$1"${config[$project_key]}"
 			export "CONFIG_${VAR_VERSION//./_}=${config[${project_key//name/version}]}"
 			echo "+ production mode: ${BASH_REMATCH[1]} (${config['registry']}/${config[$project_key]}, version: ${config[${project_key//name/version}]})"
 	 	fi
 	done
+}
+
+if [[ " $@ " == *" --prod "* ]]; then
+  prod_init "${config['registry']}/"
+else
+	prod_init
 fi
+
+echo $CONFIG_PROJECT_STACK_NAME
 
 for current_compose_file in ${param['compose.path']//,/ }; do
   echo -e "\n# find compose files in: $current_compose_file"
