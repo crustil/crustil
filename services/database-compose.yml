@@ -5,7 +5,7 @@ services:
     ports:
       - '3306'
     volumes:
-      - './mariadb_master_data:/bitnami/mariadb'
+      - 'mariadb-data:/bitnami'
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d"
       - "../sql/config/my.cnf:/etc/mysql/my.cnf"
@@ -88,3 +88,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:
       - "traefik.enable=false"
+
+volumes:
+  mariadb-data:
+    driver: local
