@@ -19,7 +19,7 @@ services:
     labels:
       - "traefik.enable=false"
   db:
-    image: mariadb:latest
+    image: bitnami/mariadb:latest
     command: ['--character-set-server=utf8mb4', '--skip-character-set-client-handshake', '--default-authentication-plugin=mysql_native_password', '--skip-name-resolve']
     expose:
       - "3306"
@@ -33,7 +33,7 @@ services:
       - api
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "../sql/init:/docker-entrypoint-initdb.d"
+      - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d"
       - "../sql/config/my.cnf:/etc/mysql/my.cnf"
     labels:
       - "traefik.enable=false"

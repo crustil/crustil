@@ -97,9 +97,18 @@ for service_key in "${!config[@]}"; do
 done
 
 if [[ " $@ " == *" --prod "* ]]; then
-	echo "+ production mode, image from: ${config['registry']}/${config['project.name']}"
-  export CONFIG_PROJECT_NAME=${config['registry']}/${config['project.name']}
+	for project_key in "${!config[@]}"; do
+		if [[ "$project_key" =~ project.(.*).name ]]; then
+			VAR_NAME=${project_key^^}
+			VAR_VERSION=${project_key//NAME/VERSION}
+			export "CONFIG_${VAR_NAME//./_}=${config[$project_key]}"
+			export "CONFIG_${VAR_VERSION//./_}=${config[${project_key//name/version}]}"
+			echo "+ production mode: ${BASH_REMATCH[1]} (${config['registry']}/${config[$project_key]}, version: ${config[${project_key//name/version}]})"
+	 	fi
+	done
 fi
+
+exit 0
 
 for current_compose_file in ${param['compose.path']//,/ }; do
   echo -e "\n# find compose files in: $current_compose_file"
@@ -140,7 +149,7 @@ function cmd() {
 function sql() {
     # $1 cmd sql dump & $2 file destination (sql)
     echo -e "## dump '${config['db.database']}' database => $1"
-    docker exec -i ${config['project.name']}_${DB_CONNECTOR}_1 sh -c "exec mysqldump $1 -uroot -p${DB_ROOT_PASSWORD}" > ./sql/$2.sql
+    docker exec -i ${config['project.name']}_${config['db.connector']}_1 sh -c "exec mysqldump $1 -uroot -p${config['db.root.password']}" > ./sql/$2.sql
 }
 
 if [[ $1 == "stop" ]]; then
@@ -237,7 +246,7 @@ elif [[ $1 == "update" ]]; then
 elif [[ $1 == "logs" ]]; then
     if [[ $2 == "stack" ]]; then
         # todo rewrite
-        docker-compose logs -ft --tail=100 ${DB_CONNECTOR} $(cat ./services-list-prod)
+        docker-compose logs -ft --tail=100 ${config['db.connector']} $(cat ./services-list-prod)
     else
         if [[ $2 != "" ]]; then
             tail="$2"
@@ -267,15 +276,15 @@ elif [[ $1 == "swarm" && $# > 1 ]]; then
             docker-compose pull
         fi
     elif [[ $2 == "push" && $3 != "all" ]]; then
-        docker tag ${config['project.name']}/$3 ${config['registry']}/${config['project.name']}/$3:${VERSION}
-        docker push ${config['registry']}/${config['project.name']}/$3:${VERSION}
-        docker tag ${config['registry']}/${config['project.name']}/$3:${VERSION} ${config['registry']}/${config['project.name']}/$3:latest
+        docker tag ${config['project.name']}/$3 ${config['registry']}/${config['project.name']}/$3:${config['project.todo.version']}
+        docker push ${config['registry']}/${config['project.name']}/$3:${config['project.todo.version']}
+        docker tag ${config['registry']}/${config['project.name']}/$3:${config['project.todo.version']} ${config['registry']}/${config['project.name']}/$3:latest
         docker push ${config['registry']}/${config['project.name']}/$3:latest
     elif [[ $2 == "push" && $3 == "all" ]]; then
         while read -r line; do
-            docker tag ${config['project.name']}/${line} ${config['registry']}/${config['project.name']}/${line}:${VERSION}
-            docker push ${config['registry']}/${config['project.name']}/${line}:${VERSION}
-            docker tag ${config['registry']}/${config['project.name']}/${line}:${VERSION} ${config['registry']}/${config['project.name']}/${line}:latest
+            docker tag ${config['project.name']}/${line} ${config['registry']}/${config['project.name']}/${line}:${config['project.todo.version']}
+            docker push ${config['registry']}/${config['project.name']}/${line}:${config['project.todo.version']}
+            docker tag ${config['registry']}/${config['project.name']}/${line}:${config['project.todo.version']} ${config['registry']}/${config['project.name']}/${line}:latest
             docker push ${config['registry']}/${config['project.name']}/${line}:latest
         done <<< $(echo $(cat ./services-list-prod) | tr " " "\n")
     elif [[ $2 == "bundle" ]]; then
@@ -297,7 +306,7 @@ elif [[ $1 == "database" ]]; then
         sql "--no-create-info --skip-triggers --no-create-db --databases ${config['db.database']}" save/${config['db.database']}-data-only-dump
     elif [[ $2 == "restore" ]]; then
         echo -e "Restore backup database"
-        cat sql/save/${config['db.database']}-dump.sql | docker exec -i ${config['project.name']}_${DB_CONNECTOR}_1 sh -c "exec mysql ${config['db.database']} -uroot -p${DB_ROOT_PASSWORD}"
+        cat sql/save/${config['db.database']}-dump.sql | docker exec -i ${config['project.name']}_${config['db.connector']}_1 sh -c "exec mysql ${config['db.database']} -uroot -p${config['db.root.password']}"
     elif [[ $2 == "init-script" ]]; then
         echo -e "## make init script for '${config['db.database']}'"
         echo -e "## make database base structure script"

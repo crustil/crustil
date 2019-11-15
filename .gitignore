@@ -3,7 +3,7 @@
 *.iml
 
 # compiled output
-/dist
+dist
 /docker/dist
 /tmp
 /out-tsc

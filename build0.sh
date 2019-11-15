@@ -42,7 +42,7 @@ echo -e "version \t ${config['version']}"
 echo -e "dashboard.name \t ${config['dashboard.name']}"
 echo -e "==================================="
 
-docker build --build-arg DASHBOARD=${config['dashboard.name']} -t "${config['project.name']}" -f ./Dockerfile .
+docker build --build-arg DASHBOARD=${config['dashboard.name']} -t "${config['project.name']}" -f ${config['dockerfile']} ${config['dockerfile.context']}
 
 if [[ " $@ " == *" --tag "* ]]; then
 	echo "tag: ${config['version']}"

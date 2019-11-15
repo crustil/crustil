@@ -2,7 +2,7 @@ FROM alpine:3.8
 
 MAINTAINER Teddy Fontaine Sheol version: 1.0
 
-LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
+LABEL maintainer="Teddy Fontaine"
 
 ARG DASHBOARD
 
@@ -135,14 +135,14 @@ RUN apk add --update tzdata \
     && cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
 
-COPY tmp/nginx.conf /etc/nginx/nginx.conf
-COPY tmp/nginx.vh.default.conf /etc/nginx/conf.d/default.conf
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx.vh.default.conf /etc/nginx/conf.d/default.conf
 COPY $DIST/$DASHBOARD $APP_HOME/
 
-RUN chmod 750 $APP_HOME/ -R
+RUN chmod 755 $APP_HOME/ -R
 
-COPY tmp/startup.sh /usr/bin/startup.sh
-COPY tmp/health-agent /usr/bin/health-agent
+COPY conf/startup.sh /usr/bin/startup.sh
+COPY conf/health-agent /usr/bin/health-agent
 
 EXPOSE 80
 EXPOSE 8000
