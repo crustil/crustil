@@ -2,7 +2,7 @@ version: "3.7"
 services:
   traefik:
     image: traefik:${CONFIG_TRAEFIK_VERSION}
-    command: --web --api --docker --logLevel=DEBUG
+    command: --web --docker --logLevel=DEBUG
     networks:
       - api
     ports:

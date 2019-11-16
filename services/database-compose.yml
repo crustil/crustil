@@ -8,7 +8,7 @@ services:
       - 'mariadb-data:/bitnami'
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d:ro"
-      - "../sql/config/my.cnf:/etc/mysql/my.cnf"
+      #- "../sql/config/my.cnf:/etc/mysql/my.cnf"
     environment:
       - MARIADB_REPLICATION_MODE=master
       - BITNAMI_DEBUG=true
