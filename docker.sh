@@ -114,8 +114,6 @@ else
 	prod_init
 fi
 
-echo $CONFIG_PROJECT_STACK_NAME
-
 for current_compose_file in ${param['compose.path']//,/ }; do
   echo -e "\n# find compose files in: $current_compose_file"
   for current_compose_file in $(find $current_compose_file -type f -exec readlink -f {} \; | grep '.*-compose.yml'); do
@@ -158,7 +156,7 @@ function sql() {
     docker exec -i ${config['project.name']}_${config['db.connector']}_1 sh -c "exec mysqldump $1 -uroot -p${config['db.root.password']}" > ./sql/$2.sql
 }
 
-SERVICE_LIST_WITH_PATH=$(find ${param['project.path']} -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
+#SERVICE_LIST_WITH_PATH=$(find ${param['project.path']} -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
 
 if [[ $1 == "stop" ]]; then
 	if [[ $2 == "all" ]]; then
