@@ -10,8 +10,8 @@ services:
       - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d:ro"
       - "../sql/config/my.cnf:/etc/mysql/my.cnf"
     environment:
-      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
       - MARIADB_REPLICATION_MODE=master
+      - BITNAMI_DEBUG=true
       - MARIADB_REPLICATION_USER=repl_user
       - MARIADB_USER=${CONFIG_DB_USER}
       - MARIADB_PASSWORD=${CONFIG_DB_USER}
