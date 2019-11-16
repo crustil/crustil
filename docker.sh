@@ -158,6 +158,8 @@ function sql() {
     docker exec -i ${config['project.name']}_${config['db.connector']}_1 sh -c "exec mysqldump $1 -uroot -p${config['db.root.password']}" > ./sql/$2.sql
 }
 
+SERVICE_LIST_WITH_PATH=$(find ${param['project.path']} -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
+
 if [[ $1 == "stop" ]]; then
 	if [[ $2 == "all" ]]; then
 		docker-compose down
@@ -180,7 +182,7 @@ elif [[ $1 == "start" ]]; then
 elif [[ $1 == "build" ]]; then
     # todo move to external build script
     if [[ $2 == "java-service" ]]; then
-      SERVICE_LIST_WITH_PATH=$(find ${param['project.path']} -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
+			docker build -t "custom-java-vertx:latest" -f ./java/Dockerfile ./java
       for item in $SERVICE_LIST_WITH_PATH; do
         if [[ "$item" =~ .*\/([a-z-]+-[a-z]+) ]]; then
           current_item=${BASH_REMATCH[1]}
@@ -188,7 +190,7 @@ elif [[ $1 == "build" ]]; then
           mkdir -vp "${param['project.path']}/${current_item}/target/config"
           echo "generate docker.json config"
           ( echo "cat <<EOF > ${param['project.path']}/${current_item}/target/config/docker.json" ; cat ${param['project.path']}/${current_item}/src/config/docker.json ) | sh
-          docker build --build-arg SERVICE=${current_item} -t "${config['project.name']}/${current_item}" -f ./java/Dockerfile ${item}/
+          docker build --build-arg SERVICE=${current_item} -t "${config['project.'$3'.name']}/${current_item}" -f ./java/Dockerfile.java ${item}/
         fi
       done
     elif [[ $2 == "other" ]]; then
@@ -287,12 +289,15 @@ elif [[ $1 == "swarm" && $# > 1 ]]; then
         docker tag ${config['registry']}/${config['project.name']}/$3:${config['project.todo.version']} ${config['registry']}/${config['project.name']}/$3:latest
         docker push ${config['registry']}/${config['project.name']}/$3:latest
     elif [[ $2 == "push" && $3 == "all" ]]; then
-        while read -r line; do
-            docker tag ${config['project.name']}/${line} ${config['registry']}/${config['project.name']}/${line}:${config['project.todo.version']}
-            docker push ${config['registry']}/${config['project.name']}/${line}:${config['project.todo.version']}
-            docker tag ${config['registry']}/${config['project.name']}/${line}:${config['project.todo.version']} ${config['registry']}/${config['project.name']}/${line}:latest
-            docker push ${config['registry']}/${config['project.name']}/${line}:latest
-        done <<< $(echo $(cat ./services-list-prod) | tr " " "\n")
+			for item in $SERVICE_LIST_WITH_PATH; do
+				if [[ "$item" =~ .*\/([a-z-]+-[a-z]+) ]]; then
+					line=${BASH_REMATCH[1]}
+					docker tag ${config['project.'$4'.name']}/${line} ${config['registry']}/${config['project.'$4'.name']}/${line}:${config['project.'$4'.version']}
+					docker push ${config['registry']}/${config['project.'$4'.name']}/${line}:${config['project.'$4'.version']}
+					docker tag ${config['registry']}/${config['project.'$4'.name']}/${line}:${config['project.'$4'.version']} ${config['registry']}/${config['project.'$4'.name']}/${line}:latest
+					docker push ${config['registry']}/${config['project.'$4'.name']}/${line}:latest
+				fi
+			done
     elif [[ $2 == "bundle" ]]; then
         docker-compose bundle -o ${config['project.name']}-bundle.dab
     elif [[ $2 == "deploy" ]]; then

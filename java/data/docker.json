@@ -1,0 +1,13 @@
+{
+  "database": {
+    "host": "db",
+    "port": 3306,
+    "database": "database",
+    "username": "username",
+    "password": "password",
+    "reconnect": true,
+    "unicode": true,
+    "autoCommit": true,
+    "maximumPoolSize": 10
+  }
+}
