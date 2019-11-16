@@ -7,7 +7,7 @@ services:
     volumes:
       - 'mariadb-data:/bitnami'
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d"
+      - "${CONFIG_DB_SQL_SCRIPT}:/docker-entrypoint-initdb.d:ro"
       - "../sql/config/my.cnf:/etc/mysql/my.cnf"
     environment:
       - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
