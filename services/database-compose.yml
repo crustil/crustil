@@ -8,11 +8,11 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
+      - MYSQL_DATABASE=${CONFIG_DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
+      - MYSQL_USER=${CONFIG_DB_USER}
+      - MYSQL_PASSWORD=${CONFIG_DB_PASSWORD}
     networks:
       - api
     volumes:
@@ -28,11 +28,11 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_HOST=${DB_ROOT_HOST}
-      - MYSQL_DATABASE=${DB_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_HOST=${CONFIG_DB_ROOT_HOST}
+      - MYSQL_DATABASE=${CONFIG_DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
+      - MYSQL_USER=${CONFIG_DB_USER}
+      - MYSQL_PASSWORD=${CONFIG_DB_PASSWORD}
     networks:
       - api
     volumes:
@@ -47,8 +47,8 @@ services:
       - "8085:8080"
     environment:
       - ADMINER_DEFAULT_DB_DRIVER=mysql
-      - ADMINER_DEFAULT_DB_HOST=${DB_CONNECTOR}
-      - ADMINER_DEFAULT_DB_NAME=${DB_DATABASE}
+      - ADMINER_DEFAULT_DB_HOST=${CONFIG_DB_CONNECTOR}
+      - ADMINER_DEFAULT_DB_NAME=${CONFIG_DB_DATABASE}
     networks:
       - api
     volumes:
@@ -56,6 +56,7 @@ services:
     labels:
       - "traefik.enable=false"
   rethinkdb:
+    image: rethinkdb:custom
     build: ../rethinkdb/
     ports:
      - "28015"
@@ -66,6 +67,7 @@ services:
      - /data/rethinkdb:/data
     command: rethinkdb -d /data --bind all
   rethinkdb-tools:
+    image: rethinkdb-tools:custom
     build: ../rethinkdb/
     volumes:
      - ../rethinkdb/:/data
