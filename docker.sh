@@ -44,6 +44,7 @@ fi
 
 if [[ " $@ " =~ --project-path=([^' ']+) ]]; then
   setParam "project.path" ${BASH_REMATCH[1]}
+	SERVICE_LIST_WITH_PATH=$(find ${param['project.path']} -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
 fi
 
 # --compose-path=[../,.,/home]
@@ -155,8 +156,6 @@ function sql() {
     echo -e "## dump '${config['db.database']}' database => $1"
     docker exec -i ${config['project.name']}_${config['db.connector']}_1 sh -c "exec mysqldump $1 -uroot -p${config['db.root.password']}" > ./sql/$2.sql
 }
-
-#SERVICE_LIST_WITH_PATH=$(find ${param['project.path']} -type f | grep '.*-service\/pom.xml\|.*-gateway\/pom.xml' | egrep -o '.*\/([a-z-]+)-([a-z]+)')
 
 if [[ $1 == "stop" ]]; then
 	if [[ $2 == "all" ]]; then

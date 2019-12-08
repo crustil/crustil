@@ -3,7 +3,7 @@ services:
   db:
     image: 'bitnami/mariadb:10.3'
     ports:
-      - '3306'
+      - '3306:3306'
     volumes:
       - 'mariadb-data:/bitnami'
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -25,8 +25,6 @@ services:
       - "traefik.enable=false"
   db-slave:
     image: 'bitnami/mariadb:10.3'
-    ports:
-      - '3306'
     depends_on:
       - db
     environment:
