@@ -251,7 +251,7 @@ elif [[ $1 == "update" ]]; then
 elif [[ $1 == "logs" ]]; then
     if [[ $2 == "stack" ]]; then
         # todo rewrite
-        docker-compose logs -ft --tail=100 ${config['db.connector']} $(cat ./services-list-prod)
+        docker-compose logs -ft --tail=100 ${config['db.connector']} ${SERVICES}
     else
         if [[ $2 != "" ]]; then
             tail="$2"
@@ -308,7 +308,16 @@ elif [[ $1 == "swarm" && $# > 1 ]]; then
         docker swarm leave --force
     fi
 elif [[ $1 == "database" ]]; then
-    if [[ $2 == "dump" ]]; then
+		if [[ $2 == "apply" ]]; then
+			if [[ "${config['project.'$3'.sql.'$4]}" == ""  ]]; then
+				echo "project $3 not found (or $4 option not set)"
+				exit -1;
+			fi
+			for sql_script in $(find ${config['project.'$3'.sql.'$4]} -type f); do
+				echo -e "[$4-$3] apply SQL script <$sql_script>"
+				cat $sql_script | docker exec -i services_${config['db.connector']}_1 sh -c "exec mysql -uroot -p${config['db.root.password']}"
+			done
+    elif [[ $2 == "dump" ]]; then
         echo -e "## dump '${config['db.database']}' database"
         sql "--databases ${config['db.database']}" save/${config['db.database']}-dump
         sql "--no-create-info --skip-triggers --no-create-db --databases ${config['db.database']}" save/${config['db.database']}-data-only-dump
