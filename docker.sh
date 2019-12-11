@@ -13,12 +13,16 @@ function setParam() {
 }
 
 function setConfig() {
-	if [[ "$3" == "" ]]; then
-		echo "= set ${1} to ${2}"
+	value=$2
+	if [[ "$value" == *"\$(pwd)"* ]]; then
+		value="${value//\$(pwd)/${param['config.file.path']}}"
 	fi
-	[[ ${1} = [\#!]* ]] || [[ ${1} = "" ]] || config[$1]=${2}
+	if [[ "$3" == "" ]]; then
+		echo "= set ${1} to ${value}"
+	fi
+	[[ ${1} = [\#!]* ]] || [[ ${1} = "" ]] || config[$1]=${value}
   VAR=${1^^}
-  export "CONFIG_${VAR//./_}=${2}"
+  export "CONFIG_${VAR//./_}=${value}"
 }
 
 # todo write usage
