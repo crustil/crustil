@@ -108,7 +108,9 @@ function prod_init() {
 			VAR_VERSION=${project_key//NAME/VERSION}
 			export "CONFIG_${VAR_NAME//./_}="$1"${config[$project_key]}"
 			export "CONFIG_${VAR_VERSION//./_}=${config[${project_key//name/version}]}"
-			echo "+ production mode: ${BASH_REMATCH[1]} (${config['registry']}/${config[$project_key]}, version: ${config[${project_key//name/version}]})"
+			echo "todo => check & fix"
+			echo "+ production mode: ${BASH_REMATCH[1]} ($1${config[$project_key]}, version: ${config[${project_key//name/version}]})"
+			#echo "+ production mode: ${BASH_REMATCH[1]} (${config['registry']}/${config[$project_key]}, version: ${config[${project_key//name/version}]})"
 	 	fi
 	done
 }
@@ -253,17 +255,14 @@ elif [[ $1 == "update" ]]; then
         done <<< $(cat ./services-list-update)
     fi
 elif [[ $1 == "logs" ]]; then
-    if [[ $2 == "stack" ]]; then
-        # todo rewrite
-        docker-compose logs -ft --tail=100 ${config['db.connector']} ${SERVICES}
-    else
-        if [[ $2 != "" ]]; then
-            tail="$2"
-        else
-            tail="all"
-        fi
-        docker-compose logs -ft --tail=${tail} $3
-     fi
+		for i in ${*:2}; do
+			if [[ $i != *"--"* ]]; then
+		  	project_service+=${config['project.services.'$i]},
+			fi
+		done
+		echo "# add folowing services to logger"
+		echo "-> ${project_service//,/ }"
+		docker-compose logs -ft --tail=100 ${project_service//,/ }
 elif [[ $1 == "sh" ]]; then
     docker-compose exec $2 bash
 elif [[ $1 == "scale" ]]; then
