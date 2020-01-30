@@ -6,6 +6,22 @@ git_path_output="../"
 ssh_prefix="ssh://git@gitlab.cloudvector.fr:10022"
 git_repository_path="micro-service/rx"
 
+usage() {
+  echo -e "$0 <options>"
+  echo ""
+  echo -e "\t--pom-path=<path>\t\tpom path"
+  echo -e "\t--pom-name=<path>\t\tpom name if differente of \"pom.xml\""
+  echo -e "\t--git-output=<path>\t\toutput directory with ../ (link to parent)"
+  echo ""
+  echo -e "\t--pull\t\t\t\tpull git repository"
+  echo -e "\t--clone\t\t\t\tclone git repository"
+}
+
+if [[ " $@ " == *" --help "* || " $@ " == *" -h "* ]]; then
+  usage
+  exit 0
+fi
+
 if [[ " $@ " =~ --pom-path=([^' ']+) ]]; then
   echo "+ set pom path"
   pom_path=${BASH_REMATCH[1]}
@@ -19,7 +35,7 @@ fi
 if [[ " $@ " =~ --git-output=([^' ']+) ]]; then
   echo "+ set git output"
   # todo check if pom path parent exist !
-  git_path_output=${BASH_REMATCH[1]}
+  git_path_output="../${BASH_REMATCH[1]}"
 fi
 
 modules=$(grep -oP '.*\K(?<=>).*(?=<\/module)' pom.xml)
