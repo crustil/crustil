@@ -178,7 +178,7 @@ elif [[ $1 == "purge" ]]; then
     fi
     docker volume prune
 elif [[ $1 == "start" ]]; then
-    cmd "up -d" $2
+    cmd "up -d --remove-orphans" $2
     #if [[ $2 == "scale" ]]; then
     #    docker-compose up -d $(echo $(cat ./services-list-scale) | sed 's/ / --scale /g' | sed 's/^/--scale /') $(cat ./services-list-prod)
     #fi
