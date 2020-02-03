@@ -83,4 +83,11 @@ if [[ " $@ " == *" --pull "* ]]; then
   cmd pull
 fi
 
+if [[ " $@ " == *" --test "* ]]; then
+  cmd fetch
+  cmd stash
+  cmd pull
+  cmd "stash apply"
+fi
+
 # grep -oP '.*\K(?<=>).*(?=<\/)' pom.xml
