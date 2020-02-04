@@ -90,4 +90,8 @@ if [[ " $@ " == *" --test "* ]]; then
   cmd "stash apply"
 fi
 
+if [[ " $@ " == *" --status "* ]]; then
+  cmd status
+fi
+
 # grep -oP '.*\K(?<=>).*(?=<\/)' pom.xml

@@ -316,7 +316,7 @@ elif [[ $1 == "database" ]]; then
 				echo "project $3 not found (or $4 option not set)"
 				exit -1;
 			fi
-			for sql_script in $(find ${config['project.'$3'.sql.'$4]} -type f); do
+			for sql_script in $(find ${config['project.'$3'.sql.'$4]} -type f -print | sort -n); do
 				echo -e "[$4-$3] apply SQL script <$sql_script>"
 				cat $sql_script | docker exec -i services_${config['db.connector']}_1 sh -c "exec mysql -uroot -p${config['db.root.password']}"
 			done
