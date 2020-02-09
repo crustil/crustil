@@ -4,7 +4,7 @@ MAINTAINER Teddy Fontaine Sheol version: 1.0
 
 ARG SERVICE=service
 
-ENV VERTICLE_FILE="target/$SERVICE.jar" \
+ENV VERTICLE_FILE="./target/$SERVICE.jar" \
     VERTICLE_HOME="/opt/verticles" \
     VERTICLE_SERVICE=$SERVICE
 

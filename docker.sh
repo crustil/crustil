@@ -38,6 +38,10 @@ setParam "config.file.name" "config.properties" 0
 setParam "project.path" "./" 0
 setParam "compose.path" "./" 0
 
+if [[ " $@ " =~ --working-directory=([^' ']+) ]]; then
+  setParam "working.directory" ${BASH_REMATCH[1]}
+fi
+
 if [[ " $@ " =~ --config-path=([^' ']+) ]]; then
   setParam "config.file.path" ${BASH_REMATCH[1]}
 fi
@@ -185,7 +189,7 @@ elif [[ $1 == "start" ]]; then
 elif [[ $1 == "build" ]]; then
     # todo move to external build script
     if [[ $2 == "java-service" ]]; then
-			docker build -t "custom-java-vertx:latest" -f ./java/Dockerfile ./java
+			docker build -t "custom-java-vertx:latest" -f ${param['working.directory']}/java/Dockerfile ${param['working.directory']}/java
       for item in $SERVICE_LIST_WITH_PATH; do
         if [[ "$item" =~ .*\/([a-z-]+-[a-z]+) ]]; then
           current_item=${BASH_REMATCH[1]}
@@ -193,7 +197,7 @@ elif [[ $1 == "build" ]]; then
           mkdir -vp "${param['project.path']}/${current_item}/target/config"
           echo "generate docker.json config"
           ( echo "cat <<EOF > ${param['project.path']}/${current_item}/target/config/docker.json" ; cat ${param['project.path']}/${current_item}/src/config/docker.json ) | sh
-          docker build --build-arg SERVICE=${current_item} -t "${config['project.'$3'.name']}/${current_item}" -f ./java/Dockerfile.java ${item}/
+          docker build --build-arg SERVICE=${current_item} -t "${config['project.'$3'.name']}/${current_item}" -f ${param['working.directory']}/java/Dockerfile.java ${item}/
         fi
       done
     elif [[ $2 == "other" ]]; then
