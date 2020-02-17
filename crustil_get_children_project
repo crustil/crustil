@@ -4,7 +4,7 @@ pom_path="./"
 pom_name="pom.xml"
 git_path_output="../"
 ssh_prefix="ssh://git@gitlab.cloudvector.fr:10022"
-git_repository_path="micro-service/rx"
+git_repository_path=""
 
 usage() {
   echo -e "$0 <options>"

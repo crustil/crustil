@@ -59,7 +59,7 @@ services:
       - "traefik.enable=false"
   rethinkdb:
     image: rethinkdb:custom
-    build: ../rethinkdb/
+    build: ${CONFIG_NOSQL_BUILD_PATH}
     ports:
      - "28015"
      - "8080"
@@ -70,9 +70,9 @@ services:
     command: rethinkdb -d /data --bind all
   rethinkdb-tools:
     image: rethinkdb-tools:custom
-    build: ../rethinkdb/
+    build: ${CONFIG_NOSQL_BUILD_PATH}
     volumes:
-     - ../rethinkdb/:/data
+     - ${CONFIG_NOSQL_TOOLS_DATA_PATH}:/data
     networks:
       - api
     command: rethinkdb import -f /data/data.json --table data.table --format json -c rethinkdb:28015

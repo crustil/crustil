@@ -15,7 +15,7 @@ function setParam() {
 function setConfig() {
 	value=$2
 	if [[ "$value" == *"\$(pwd)"* ]]; then
-		value="${value//\$(pwd)/${param['config.file.path']}}"
+		value="$(pwd)/${value//\$(pwd)/${param['config.file.path']}}"
 	fi
 	if [[ "$3" == "" ]]; then
 		echo "= set ${1} to ${value}"
@@ -33,10 +33,11 @@ function usage() {
 }
 
 # Default config
-setParam "config.file.path" "./" 0
+setParam "config.file.path" "${CRUSTIL}" 0
 setParam "config.file.name" "config.properties" 0
-setParam "project.path" "./" 0
-setParam "compose.path" "./" 0
+setParam "project.path" "${CRUSTIL}" 0
+setParam "compose.path" "${CRUSTIL}" 0
+setParam "working.directory" "${CRUSTIL}" 0
 
 if [[ " $@ " =~ --working-directory=([^' ']+) ]]; then
   setParam "working.directory" ${BASH_REMATCH[1]}
@@ -296,6 +297,7 @@ elif [[ $1 == "swarm" && $# > 1 ]]; then
 			for item in $SERVICE_LIST_WITH_PATH; do
 				if [[ "$item" =~ .*\/([a-z-]+-[a-z]+) ]]; then
 					line=${BASH_REMATCH[1]}
+					echo $line
 					docker tag ${config['project.'$4'.name']}/${line} ${config['registry']}/${config['project.'$4'.name']}/${line}:${config['project.'$4'.version']}
 					docker push ${config['registry']}/${config['project.'$4'.name']}/${line}:${config['project.'$4'.version']}
 					docker tag ${config['registry']}/${config['project.'$4'.name']}/${line}:${config['project.'$4'.version']} ${config['registry']}/${config['project.'$4'.name']}/${line}:latest

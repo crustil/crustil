@@ -13,15 +13,31 @@ setParam() {
 }
 
 # Default config
-setParam "config.file.path" "./" 0
+setParam "config.file.path" "${CRUSTIL}" 0
 setParam "config.file.name" "build.properties" 0
+setParam "dockerfile.context" "." 0
+setParam "dockerfile" "Dockerfile" 0
+setParam "dockerfile.path" "." 0
 
 if [[ " $@ " =~ --config-path=([^' ']+) ]]; then
   setParam "config.file.path" ${BASH_REMATCH[1]}
+	ls ${BASH_REMATCH[1]}
 fi
 
 if [[ " $@ " =~ --config-name=([^' ']+) ]]; then
   setParam "config.file.name" ${BASH_REMATCH[1]}
+fi
+
+if [[ " $@ " =~ --dockerfile-context=([^' ']+) ]]; then
+  setParam "dockerfile.context" ${BASH_REMATCH[1]}
+fi
+
+if [[ " $@ " =~ --dockerfile=([^' ']+) ]]; then
+  setParam "dockerfile" ${BASH_REMATCH[1]}
+fi
+
+if [[ " $@ " =~ --dockerfile-path=([^' ']+) ]]; then
+  setParam "dockerfile.path" ${BASH_REMATCH[1]}
 fi
 
 if [[ ! -f "${param['config.file.path']}/${param['config.file.name']}" ]]; then
@@ -30,9 +46,7 @@ if [[ ! -f "${param['config.file.path']}/${param['config.file.name']}" ]]; then
 fi
 
 while IFS=$':= \t' read key value; do
-	if [[ "$key" != "" ]]; then
-  	[[ ${key} = [\#!]* ]] || [[ ${key} = "" ]] || config[$key]=${value}
-	fi
+  [[ ${key} = [\#!]* ]] || [[ ${key} = "" ]] || config[$key]=${value}
 done < "${param['config.file.path']}/${param['config.file.name']}"
 
 echo -e "======== Build properties ========"
@@ -42,7 +56,7 @@ echo -e "version \t ${config['version']}"
 echo -e "dashboard.name \t ${config['dashboard.name']}"
 echo -e "==================================="
 
-docker build --build-arg DASHBOARD=${config['dashboard.name']} -t "${config['project.name']}" -f ${config['dockerfile']} ${config['dockerfile.context']}
+docker build --build-arg DASHBOARD=${config['dashboard.name']} -t "${config['project.name']}" -f ${param['dockerfile.path']}/${param['dockerfile']} ${param['dockerfile.context']}
 
 if [[ " $@ " == *" --tag "* ]]; then
 	echo "tag: ${config['version']}"
