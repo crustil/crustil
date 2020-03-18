@@ -5,6 +5,8 @@ set -e
 typeset -A config
 typeset -A param
 
+CRUSTIL="$(npm root -g)/crustil/"
+
 function setParam() {
 	if [[ "$3" == "" ]]; then
 		echo "= set ${1} to ${2}"
@@ -15,7 +17,7 @@ function setParam() {
 function setConfig() {
 	value=$2
 	if [[ "$value" == *"\$(pwd)"* ]]; then
-		value="$(pwd)/${value//\$(pwd)/${param['config.file.path']}}"
+		value="${value//\$(pwd)/${param['config.file.path']}}"
 	fi
 	if [[ "$3" == "" ]]; then
 		echo "= set ${1} to ${value}"

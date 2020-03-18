@@ -51,6 +51,11 @@ if [[ " $@ " =~ --git-output=([^' ']+) ]]; then
   git_path_output="../${BASH_REMATCH[1]}"
 fi
 
+if [[ " $@ " =~ --git-tag=([^' ']+) ]]; then
+  echo "+ set git tag"
+  git_tag=${BASH_REMATCH[1]}
+fi
+
 modules=$(grep -oP '.*\K(?<=>).*(?=<\/module>)' pom.xml)
 modules=${modules//..\//}
 
@@ -92,6 +97,16 @@ fi
 
 if [[ " $@ " == *" --status "* ]]; then
   cmd status
+fi
+
+if [[ " $@ " == *" --tag "* ]]; then
+  if [[ "${git_tag}" == "" ]]; then
+    echo "error git_tag not found !"
+    exit -1
+  fi
+  echo "-> git tag ${git_tag}"
+  git tag -a ${git_tag} -m ""
+  cmd "tag -a ${git_tag} -m"
 fi
 
 # grep -oP '.*\K(?<=>).*(?=<\/)' pom.xml

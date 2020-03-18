@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -e
+
+#find . -type f -name '*.iml' -delete
+#find . -type f -name 'file-cache-*' -delete
+
+clean_dir() {
+  echo "clean $1 folders"
+	find . -type d -name "$1" -exec rm -rf {} +
+	echo "done !"
+}
+
+clean_file() {
+  echo "clean $1 files"
+  find . -type f -name '*.'$1 -delete
+  echo "done !"
+}
+
+if [[ $1 == "vertx" ]]; then
+  clean_dir ".vertx"
+  clean_file "log"
+elif [[ $1 == "target" ]]; then
+  clean_dir "target"
+elif [[ $1 == "node" ]]; then
+  clean_dir "node_modules"
+elif [[ $1 == "project" ]]; then
+  clean_file "iml"
+else
+  echo -e "vertx\t remove all tmp vertx folders"
+  echo -e "target\t remove target folders"
+  echo -e "node\t remove all extra node folders"
+  echo -e "project\t remove all iml files"
+  echo -e ""
+  echo -e "$0 vertx|target|node|project"
+fi
