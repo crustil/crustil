@@ -10,4 +10,7 @@ java \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory \
 -jar $VERTICLE_SERVICE.jar \
 -cp . \
--ha -cluster -conf $VERTICLE_SERVICE.json
+-ha -cluster -conf $VERTICLE_SERVICE.json \
+-DDEFAULT_JVM_OPTS="-Xms$VERTICLE_JAVA_XMS \
+-Xmx$VERTICLE_JAVA_XMX -XX:MaxPermSize=$VERTICLE_JAVA_MAX_PERM_SIZE \
+-XX:ReservedCodeCacheSize=$VERTICLE_JAVA_RESERVED_CODE_CACHE_SIZE"
