@@ -144,6 +144,8 @@ RUN chmod 755 $APP_HOME/ -R
 COPY conf/startup.sh /usr/bin/startup.sh
 COPY conf/health-agent /usr/bin/health-agent
 
+USER 1000:1000
+
 EXPOSE 80
 EXPOSE 8000
 

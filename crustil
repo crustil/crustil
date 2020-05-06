@@ -177,7 +177,19 @@ function sql() {
     docker exec -i ${config['project.name']}_${config['db.connector']}_1 sh -c "exec mysqldump $1 -uroot -p${config['db.root.password']}" > ./sql/$2.sql
 }
 
-if [[ $1 == "stop" ]]; then
+if [[ $1 == "generate" ]]; then
+	mkdir -p output
+	docker-compose config > output/project.yml
+elif [[ $1 == "save" ]]; then
+	mkdir -p output/images
+	for img in $(docker-compose config | awk '{if ($1 == "image:") print $2;}'); do
+		echo "extract ${img//\//-} image...	"
+  	docker save -o output/images/${img//\//-}.tar $img
+	done
+	echo ""
+	du -hs output/images/*
+	du -hs output/images
+elif [[ $1 == "stop" ]]; then
 	if [[ $2 == "all" ]]; then
 		docker-compose down
 	else
