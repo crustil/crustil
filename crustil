@@ -211,7 +211,8 @@ elif [[ $1 == "start" ]]; then
 elif [[ $1 == "build" ]]; then
     # todo move to external build script
     if [[ $2 == "java-service" ]]; then
-			docker build -t "custom-java-vertx:${config['project.'$3'.version']}" -f ${param['working.directory']}/java/Dockerfile ${param['working.directory']}/java
+			#docker build -t "custom-java-vertx:${config['project.'$3'.version']}" -f ${param['working.directory']}/java/Dockerfile ${param['working.directory']}/java
+			docker build -t "custom-java-vertx:${config['project.'$3'.version.base']}" -f ${param['working.directory']}/java/Dockerfile ${param['working.directory']}/java
       for item in $SERVICE_LIST_WITH_PATH; do
         if [[ "$item" =~ .*\/([a-z-]+-[a-z]+) ]]; then
           current_item=${BASH_REMATCH[1]}
