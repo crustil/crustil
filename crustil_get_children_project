@@ -3,8 +3,9 @@
 pom_path="./"
 pom_name="pom.xml"
 git_path_output="../"
-ssh_prefix="ssh://git@gitlab.cloudvector.fr:10022"
 git_repository_path=""
+origin_url=$(git config --get remote.origin.url)
+ssh_prefix=${origin_url//\/${PWD##*/}.git/}
 
 usage() {
   echo -e "$0 <options>"
@@ -24,6 +25,9 @@ if [[ " $@ " == *" --help "* || " $@ " == *" -h "* ]]; then
   usage
   exit 0
 fi
+
+echo "+ set $origin_url"
+echo "+ set $ssh_prefix"
 
 if [[ " $@ " =~ --ssh-prefix=([^' ']+) ]]; then
   echo "+ set ssh prefix"
@@ -72,7 +76,7 @@ clone() {
   cd $git_path_output
   for item in $modules; do
     echo "-> git clone on $item"
-    git clone ${ssh_prefix}/${git_repository_path}/${item}.git
+    git clone ${ssh_prefix}/${item}.git
   done
 }
 
