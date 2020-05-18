@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   db:
-    image: 'bitnami/mariadb:10.3'
+    image: 'bitnami/mariadb:10.4'
     ports:
       - '3306:3306'
     volumes:
@@ -19,12 +19,13 @@ services:
       - MARIADB_REPLICATION_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
       - ALLOW_EMPTY_PASSWORD=no
       - MARIADB_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
+      - MARIADB_EXTRA_FLAGS=--wait_timeout=28800 --innodb_log_file_size=128MB --max_allowed_packet=128MB
     networks:
       - api
     labels:
       - "traefik.enable=false"
   db-slave:
-    image: 'bitnami/mariadb:10.3'
+    image: 'bitnami/mariadb:10.4'
     depends_on:
       - db
     environment:
@@ -39,6 +40,12 @@ services:
       - MARIADB_MASTER_ROOT_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
       - ALLOW_EMPTY_PASSWORD=no
       - MARIADB_REPLICATION_PASSWORD=${CONFIG_DB_ROOT_PASSWORD}
+      - MARIADB_EXTRA_FLAGS=--wait_timeout=28800 --innodb_log_file_size=128MB --max_allowed_packet=128MB
+    command: [
+              '--wait_timeout=28800',
+              '--innodb_log_file_size=128MB',
+              '--max_allowed_packet=128MB'
+             ]
     networks:
       - api
     labels:
