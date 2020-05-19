@@ -76,6 +76,9 @@ clone() {
   cd $git_path_output
   for item in $modules; do
     echo "-> git clone on $item"
+    if [[ ${IS_PROD_MODE} == "TRUE" ]]; then
+      rm -rf ${item}
+    fi
     git clone ${ssh_prefix}/${item}.git
   done
 }
