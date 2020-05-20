@@ -1,6 +1,17 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 jq -s add docker.json $(find $VERTICLE_HOME/data -type f -exec readlink -f {} \; | grep '.*.json$') > $VERTICLE_SERVICE.json
+
+if [[ "${SERVICES}" =~ \[([^' ']+)\] ]]; then
+  for service in ${BASH_REMATCH[1]//,/ }; do
+    result=""
+    while [ "${result}" != "\"healthy\"" ]; do
+      result=$(curl -s --unix-socket /var/run/docker.sock http:/v1.4/containers/${COMPOSE_PROJECT_NAME}_${service}_1/json | jq '.State.Health.Status')
+      echo "Wainting service ${service}...${result}..."
+      sleep 1
+    done
+  done
+fi
 
 java \
 -Dio.netty.tryReflectionSetAccessible=true \
