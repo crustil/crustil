@@ -6,6 +6,10 @@ set -e
 #service=db
 #SERVICES=[api-gateway]
 
+DOCKER_CURRENT_ID=<empty>
+COMPOSE_PROJECT_NAME=$(curl -s --unix-socket /var/run/docker.sock http:/v1.4/containers/${DOCKER_CURRENT_ID}/json | jq '.Config.Labels."com.docker.compose.project"')
+COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME//\"/}
+
 #if [[ " $@ " =~ --compose-path=\[([^' ']+)\] ]]; then
 if [[ "${SERVICES}" =~ \[([^' ']+)\] ]]; then
   for service in ${BASH_REMATCH[1]//,/ }; do

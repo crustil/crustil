@@ -4,6 +4,7 @@ jq -s add docker.json $(find $VERTICLE_HOME/data -type f -exec readlink -f {} \;
 
 DOCKER_CURRENT_ID=$(basename "$(head /proc/1/cgroup)")
 COMPOSE_PROJECT_NAME=$(curl -s --unix-socket /var/run/docker.sock http:/v1.4/containers/${DOCKER_CURRENT_ID}/json | jq '.Config.Labels."com.docker.compose.project"')
+COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME//\"/}
 
 if [[ "${SERVICES}" =~ \[([^' ']+)\] ]]; then
   for service in ${BASH_REMATCH[1]//,/ }; do
