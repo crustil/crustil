@@ -35,6 +35,7 @@ java \
 -Dhazelcast.diagnostics.enabled=true \
 -Dhazelcast.logging.type=slf4j \
 -Dvertx.hazelcast.config=cluster-config.xml \
+-Dvertx.hazelcast.async-api=true \
 -jar $VERTICLE_SERVICE.jar \
 -cp . \
 -ha -cluster -conf $VERTICLE_SERVICE.json \
