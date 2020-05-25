@@ -7,9 +7,9 @@ ARG SERVICE=service
 ENV VERTICLE_FILE="./target/$SERVICE.jar" \
     VERTICLE_HOME="/opt/verticles" \
     VERTICLE_SERVICE=$SERVICE \
-    VERTICLE_JAVA_XMS="400m" \
-    VERTICLE_JAVA_XMX="1024m" \
-    VERTICLE_JAVA_MAX_PERM_SIZE="128m" \
+    VERTICLE_JAVA_XMS="2m" \
+    VERTICLE_JAVA_XMX="128m" \
+    VERTICLE_JAVA_MAX_PERM_SIZE="64m" \
     VERTICLE_JAVA_RESERVED_CODE_CACHE_SIZE="48m"
 
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
