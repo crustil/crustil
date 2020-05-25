@@ -17,7 +17,7 @@ if [[ "${SERVICES}" =~ \[([^' ']+)\] ]]; then
   done
 fi
 
-java \
+java -Xms$VERTICLE_JAVA_XMS -Xmx$VERTICLE_JAVA_XMX \
 -Dio.netty.tryReflectionSetAccessible=true \
 -Dio.netty.util.internal.ReflectionUtil=false \
 -Dvertx.disableDnsResolver=true \
