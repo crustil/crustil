@@ -34,6 +34,7 @@ java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dhazelcast.diagnostics.enabled=true \
 -Dhazelcast.logging.type=slf4j \
+-Dvertx.hazelcast.config=cluster-config.xml \
 -jar $VERTICLE_SERVICE.jar \
 -cp . \
 -ha -cluster -conf $VERTICLE_SERVICE.json \
