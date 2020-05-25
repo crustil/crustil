@@ -100,7 +100,6 @@
         fail-safety. 0 means no backup.
     -->
     <backup-count>1</backup-count>
-    <max-size policy="PER_NODE">50</max-size>
   </multimap>
 
   <map name="__vertx.haInfo">
