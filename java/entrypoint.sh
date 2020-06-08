@@ -11,13 +11,13 @@ if [[ "${SERVICES}" =~ \[([^' ']+)\] ]]; then
     result=""
     while [ "${result}" != "\"healthy\"" ]; do
       result=$(curl -s --unix-socket /var/run/docker.sock http:/v1.4/containers/${COMPOSE_PROJECT_NAME}_${service}_1/json | jq '.State.Health.Status')
-      echo "Wainting service ${service}...${result}..."
+      echo "Waiting service ${service}...${result}..."
       sleep 1
     done
   done
 fi
 
-java -Xms$VERTICLE_JAVA_XMS -Xmx$VERTICLE_JAVA_XMX -XX:-UseContainerSupport\
+java -Xms$VERTICLE_JAVA_XMS -Xmx$VERTICLE_JAVA_XMX -XX:-UseContainerSupport \
 -Dio.netty.tryReflectionSetAccessible=true \
 -Dio.netty.util.internal.ReflectionUtil=false \
 -Dvertx.disableDnsResolver=true \
