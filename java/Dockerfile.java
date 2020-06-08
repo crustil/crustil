@@ -10,7 +10,8 @@ ENV VERTICLE_FILE="./target/$SERVICE.jar" \
     VERTICLE_JAVA_XMS="2m" \
     VERTICLE_JAVA_XMX="128m" \
     VERTICLE_JAVA_MAX_PERM_SIZE="64m" \
-    VERTICLE_JAVA_RESERVED_CODE_CACHE_SIZE="48m"
+    VERTICLE_JAVA_RESERVED_CODE_CACHE_SIZE="48m" \
+    VERTICLE_JAVA_MAX_RAM="128m" \
 
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
