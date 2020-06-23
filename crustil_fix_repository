@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+
+working_directory="."
+
+usage() {
+  echo -e "$0 <options>"
+  echo ""
+  echo -e "\t--working-directory=<path>\t\t\tset working directory"
+}
+
+if [[ " $@ " == *" --help "* || " $@ " == *" -h "* ]]; then
+  usage
+  exit 0
+fi
+
+if [[ " $@ " =~ --working-directory=([^' ']+) ]]; then
+  echo "+ set working directory"
+  working_directory=${BASH_REMATCH[1]}
+fi
+
+repositories=$(find ${working_directory} -type f | grep '.git/config' | egrep -o '.*\/([a-z-]+)\/')
+
+for repository in ${repositories}; do
+  echo "-> fix ${repository}"
+  cd ${repository}
+  git config core.filemode false
+  cd -
+done
+
+echo "-> done."
