@@ -58,11 +58,26 @@ modules=$(grep -oP '.*\K(?<=>).*(?=<\/module>)' pom.xml)
 modules=${modules//..\//}
 
 cmd() {
+  echo "-> git $1 on parent project"
+  git $1
   for item in $modules; do
     echo "-> git $1 on $item"
     # check if item exist before action
     cd $git_path_output/$item
     git $1
+  done
+}
+
+latest() {
+  tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+  echo "-> update to latest tag on parent project"
+  git checkout $tag -b latest
+  for item in $modules; do
+    tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    echo "-> update to latest tag on parent on $item"
+    # check if item exist before action
+    cd $git_path_output/$item
+    git checkout $tag -b latest
   done
 }
 
@@ -99,6 +114,21 @@ fi
 
 if [[ " $@ " == *" --master "* ]]; then
   cmd "checkout master"
+fi
+
+if [[ " $@ " == *" --reset "* ]]; then
+  echo "-> reset all projects to master"
+  cmd "reset --hard origin/master"
+fi
+
+if [[ " $@ " =~ --checkout-tag=([^' ']+) ]]; then
+  checkout_tag=${BASH_REMATCH[1]}
+  cmd "fetch --all --tags"
+  cmd "checkout tags/${checkout_tag} -b ${checkout_tag}-branch"
+fi
+
+if [[ " $@ " == *" --checkout-last-tag "* ]]; then
+  latest
 fi
 
 if [[ " $@ " =~ --dev=([^' ']+) ]]; then
