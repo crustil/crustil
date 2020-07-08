@@ -18,11 +18,15 @@ if [[ "${SERVICES}" =~ \[([^' ']+)\] ]]; then
 fi
 
 java -Xms$VERTICLE_JAVA_XMS -Xmx$VERTICLE_JAVA_XMX -XX:-UseContainerSupport -XX:MaxRAM=$VERTICLE_JAVA_MAX_RAM \
--XX:+UseSerialGC -XX:+TieredCompilation -XX:TieredStopAtLevel=1 \
--XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 \
+-server -XX:+UseParallelGC -XX:+TieredCompilation -XX:TieredStopAtLevel=1 \
+-XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=50 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 \
 -Dio.netty.tryReflectionSetAccessible=true \
 -Dio.netty.util.internal.ReflectionUtil=false \
 -Dvertx.disableDnsResolver=true \
+-Dvertx.disableWebsockets=true \
+-Dvertx.flashPolicyHandle=false \
+-Dvertx.threadChecks=false \
+-Dvertx.disableContextTimings=true \
 --add-modules java.se \
 --add-exports java.base/jdk.internal.misc=ALL-UNNAMED \
 --add-exports java.base/jdk.internal.ref=ALL-UNNAMED \
@@ -43,6 +47,6 @@ java -Xms$VERTICLE_JAVA_XMS -Xmx$VERTICLE_JAVA_XMX -XX:-UseContainerSupport -XX:
 -ha -cluster -conf $VERTICLE_SERVICE.json \
 -DDEFAULT_JVM_OPTS="-Xms$VERTICLE_JAVA_XMS -XX:-UseContainerSupport -XX:MaxRAM=$VERTICLE_JAVA_MAX_RAM \
 -XX:+UseSerialGC -XX:+TieredCompilation -XX:TieredStopAtLevel=1 \
--XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 \
+-XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=50 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 \
 -Xmx$VERTICLE_JAVA_XMX -XX:MaxPermSize=$VERTICLE_JAVA_MAX_PERM_SIZE \
 -XX:ReservedCodeCacheSize=$VERTICLE_JAVA_RESERVED_CODE_CACHE_SIZE"

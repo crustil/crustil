@@ -11,7 +11,7 @@ ENV VERTICLE_FILE="./target/$SERVICE.jar" \
     VERTICLE_JAVA_XMX="64m" \
     VERTICLE_JAVA_MAX_PERM_SIZE="48m" \
     VERTICLE_JAVA_RESERVED_CODE_CACHE_SIZE="48m" \
-    VERTICLE_JAVA_MAX_RAM="64m"
+    VERTICLE_JAVA_MAX_RAM="128m"
 
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
@@ -20,8 +20,6 @@ RUN mkdir -p $VERTICLE_HOME/data
 
 COPY $VERTICLE_FILE $VERTICLE_HOME/
 COPY target/config/docker.json $VERTICLE_HOME/
-
-#COPY target/cluster.xml $VERTICLE_HOME/
 
 WORKDIR $VERTICLE_HOME
 ENTRYPOINT ["sh", "-c"]
