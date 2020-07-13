@@ -22,8 +22,6 @@ services:
     ports:
       - "5701:5701"
     environment:
-      - hazelcast.ip=`ip route get 8.8.8.8 | awk '{print $NF; exit}'
-      - hazelcast.port=5701
       - JAVA_OPTS="-Dhazelcast.config=/opt/hazelcast/config_ext/hazelcast.xml"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

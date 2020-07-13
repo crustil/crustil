@@ -26,6 +26,8 @@ function setConfig() {
 	if [[ "$value" == *"\$(lib)"* ]]; then
 		value="${value//\$(lib)/$(npm root -g)\/crustil}"
 	fi
+	value="${value//\\/}"
+	value=$(echo $value | tr -s /)
 	if [[ "$3" == "" ]]; then
 		echo "= set ${1} to ${value}"
 	fi
