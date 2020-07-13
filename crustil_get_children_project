@@ -170,8 +170,9 @@ if [[ " $@ " == *" --tag "* ]]; then
     exit -1
   fi
   echo "-> git tag ${git_tag}"
-  git tag -a ${git_tag} -m ""
-  cmd "tag -a ${git_tag} -m"
+  #git tag -a ${git_tag} -m "version : ${git_tag}"
+  cmd "tag -a ${git_tag} -m version:${git_tag}"
+  cmd "push origin ${git_tag}"
 fi
 
 # grep -oP '.*\K(?<=>).*(?=<\/)' pom.xml

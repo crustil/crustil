@@ -15,6 +15,19 @@ services:
       - "${CONFIG_TRAEFIK_CONFIG_PATH}/acme.json:/acme.json"
     labels:
       - "traefik.enable=false"
+  hazelcast:
+    image: hazelcast/hazelcast:${CONFIG_HAZELCAST_VERSION}
+    networks:
+      - api
+    ports:
+      - "5701:5701"
+    environment:
+      - hazelcast.ip=`ip route get 8.8.8.8 | awk '{print $NF; exit}'
+      - hazelcast.port=5701
+      - JAVA_OPTS="-Dhazelcast.config=/opt/hazelcast/config_ext/hazelcast.xml"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "${CONFIG_HAZELCAST_CONFIG_PATH}:/opt/hazelcast/config_ext"
   rabbitmq:
     image: rabbitmq:3-management-alpine
     networks:
