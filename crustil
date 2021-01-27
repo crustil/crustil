@@ -79,7 +79,7 @@ function generate_default_properties_file() {
   project.domain=<domain.fr>
   project.api=<api.domain.fr>
 
-  registry=registry.cloudvector.fr/<project_name>
+  registry=registry.domain.fr/<project_name>
   addon.pos=41
   nginx.config.path=./nginx/
 

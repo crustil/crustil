@@ -63,7 +63,7 @@ project.stack.dashboard.admin.json=/data/stack/config/dashboard-admin     # chem
 
 project.base.gateway.json.path=/data/xxxx/config/gateway                  # chemin de la configuration spécifique utilisée par l'api-gateway
 
-registry=registry.cloudvector.fr/<project_name>                           # url du registry Docker suvi du
+registry=registry.domain.fr/<project_name>                                # url du registry Docker suvi du
 nginx.config.path=$(lib)/nginx                                            # chemin de configuration de Nginx
 traefik.version=v1.7.19                                                   # version de Traefik
 traefik.config.path=$(lib)/traefik                                        # dossier de configuration de Traefik
