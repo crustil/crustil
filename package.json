@@ -1,0 +1,29 @@
+{
+    "name": "crustil",
+    "version": "0.1.43",
+    "description": "Crustil est un ensemble d'outils de gestion de configuration Docker et de projet. Il est utile pour le développement et pour la mise en production.",
+    "bin": {
+      "crustil": "./crustil",
+      "crustil_build_old": "./crustil_build_old",
+      "crustil_set_ip": "./crustil_set_ip",
+      "crustil_build": "./crustil_build",
+      "crustil_clean": "./crustil_clean",
+      "crustil_get_children_project": "./crustil_get_children_project",
+      "crustil_backup_project": "./crustil_backup_project",
+      "crustil_fix_repository": "./crustil_fix_repository"
+    },
+    "keywords": ["bash", "docker", "docker-compose", "devops", "deployement", "toolbox"],
+    "license": "agpl-3.0",
+    "author": "Teddy Fontaine <pro@teddyfontaine.fr>",
+    "contributors": [
+      "Teddy Fontaine <pro@teddyfontaine.fr>"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "ssh://git@github.com:tfSheol/crustil.git"
+    },
+    "bugs": {
+      "url": "https://github.com/tfSheol/crustil/issues"
+    },
+    "homepage": "https://www.npmjs.com/package/crustil"
+  }
