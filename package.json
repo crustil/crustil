@@ -1,6 +1,6 @@
 {
     "name": "crustil",
-    "version": "0.1.44",
+    "version": "0.1.45",
     "description": "Crustil est un ensemble d'outils de gestion de configuration Docker et de projet. Il est utile pour le développement et pour la mise en production.",
     "bin": {
       "crustil": "./crustil",
@@ -12,7 +12,7 @@
       "crustil_backup_project": "./crustil_backup_project",
       "crustil_fix_repository": "./crustil_fix_repository"
     },
-    "keywords": ["bash", "docker", "docker-compose", "devops", "deployement", "toolbox"],
+    "keywords": ["bash", "docker", "docker-compose", "devops", "deployement", "toolbox", "devops-tools"],
     "license": "agpl-3.0",
     "author": "Teddy Fontaine <pro@teddyfontaine.fr>",
     "contributors": [
